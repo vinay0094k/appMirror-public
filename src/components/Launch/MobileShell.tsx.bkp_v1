@@ -1,0 +1,100 @@
+// src/components/MobileShell.tsx
+import React from "react";
+import { Badge } from "@/components/ui/badge";
+import { ChevronLeft } from "lucide-react";
+import clsx from "clsx";
+
+type MobileShellProps = {
+  children: React.ReactNode;
+  // Header
+  title?: string;
+  subtitle?: string;
+  showBack?: boolean;
+  onBack?: () => void;
+
+  // Badge outside the phone
+  badgeText?: string;
+  showBadge?: boolean;
+
+  // Size/spacing overrides
+  outerClassName?: string;
+  innerClassName?: string;
+  contentClassName?: string;
+};
+
+export default function MobileShell({
+  children,
+  title,
+  subtitle,
+  showBack = false,
+  onBack,
+
+  badgeText = "NEW",
+  showBadge = false,
+
+  outerClassName,
+  innerClassName,
+  contentClassName,
+}: MobileShellProps) {
+  return (
+    <div className="min-h-[80vh] w-full flex items-center justify-center px-4">
+      <div className="relative">
+        {showBadge && (
+          <div className="absolute -right-4 top-6 z-20">
+            <Badge className="bg-violet-600 text-white border-none shadow-lg">
+              {badgeText}
+            </Badge>
+          </div>
+        )}
+
+        <div
+          className={clsx(
+            "w-[320px] md:w-[400px] h-[740px] bg-gradient-to-br from-purple-600 via-pink-600 to-red-500 rounded-[3rem] p-2 shadow-2xl",
+            outerClassName
+          )}
+        >
+          <div
+            className={clsx(
+              "w-full h-full bg-black rounded-[2.5rem] relative overflow-hidden",
+              innerClassName
+            )}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-red-500/20 pointer-events-none" />
+
+            <div
+              className={clsx(
+                "relative z-10 h-full w-full px-5 pb-5 pt-8 flex flex-col gap-6 overflow-y-auto text-white",
+                contentClassName
+              )}
+            >
+              {(title || showBack) && (
+                <header className="mb-1">
+                  <div className="flex items-center gap-3">
+                    {showBack && (
+                      <button
+                        type="button"
+                        onClick={onBack}
+                        aria-label="Back"
+                        className="p-2 rounded-full bg-white/10 hover:bg-white/15 border border-white/10"
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
+                    )}
+                    {title && (
+                      <h1 className="text-2xl font-bold leading-tight">{title}</h1>
+                    )}
+                  </div>
+                  {subtitle && (
+                    <p className="text-sm text-slate-300 mt-1">{subtitle}</p>
+                  )}
+                </header>
+              )}
+
+              {children}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

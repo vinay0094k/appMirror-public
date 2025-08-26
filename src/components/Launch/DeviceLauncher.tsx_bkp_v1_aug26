@@ -1,0 +1,196 @@
+
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Smartphone, ChevronDown, Upload, Loader2 } from "lucide-react";
+import { launchDevice, LaunchRequest } from "@/services/api";
+import { toast } from "sonner";
+
+const DeviceLauncher = () => {
+  const [selectedDevice, setSelectedDevice] = useState("iPhone 15 Pro");
+  const [selectedOS, setSelectedOS] = useState("iOS 18.2");
+  const [isLaunching, setIsLaunching] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [uploadOptions, setUploadOptions] = useState<string[]>([]);
+  const [deviceStatus, setDeviceStatus] = useState<string>("");
+
+
+  const handleLaunchDevice = async () => {
+    setIsLaunching(true);
+    setDeviceStatus("Preparing device...");
+
+    try {
+      //Determine the platform from device name or os
+      const platform = selectedDevice.includes("iphone") || selectedDevice.includes("ios") ? "ios" : "android";
+      const request: LaunchRequest = {
+        device_name: selectedDevice,
+        os_version: selectedOS,
+        platform: platform
+      };
+      const response = await launchDevice(request);
+
+      setSessionId(response.session_id);
+      setUploadOptions(response.upload_options);
+      setDeviceStatus(response.status);
+
+      toast.success(response.message);
+    
+    } catch (error) {
+      console.error("Failed to launch device:", error);
+      toast.error("Failed to launch device. Please try again..");
+      setDeviceStatus("Failed");
+
+    } finally {
+      setIsLaunching(false);
+    }
+  };
+
+
+  const devices = [
+    "iPhone 15 Pro",
+    "iPhone 15",
+    "iPhone 14 Pro",
+    "Samsung Galaxy S24",
+    "Google Pixel 8",
+    "OnePlus 12"
+  ];
+
+  const osVersions = [
+    "iOS 18.2",
+    "iOS 17.5",
+    "Android 14",
+    "Android 13",
+    "Android 12"
+  ];
+
+  return (
+    <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+      {/* Device Preview */}
+      <div className="flex justify-center">
+        <div className="relative">
+          <div className="w-80 h-[600px] bg-gradient-to-br from-purple-600 via-pink-600 to-red-500 rounded-[3rem] p-2 shadow-2xl">
+            <div className="w-full h-full bg-black rounded-[2.5rem] flex items-center justify-center relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-red-500/20"></div>
+              <Button 
+                className="bg-white/90 text-black hover:bg-white text-lg px-8 py-3 rounded-full font-semibold shadow-lg z-10"
+                onClick={() => console.log("Starting app...")}
+              >
+                Tap to Start
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Launch Controls */}
+      <div className="space-y-8">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-primary border-primary">
+              NEW
+            </Badge>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground">
+            Upload mobile builds, pick any device on your need.
+          </h1>
+          <p className="text-lg text-muted-foreground leading-relaxed">
+            “Test in real-time through your browser. Professional mobile testing made simple.”
+          </p>
+        </div>
+
+        {/* Device Selection */}
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-muted-foreground">Device</label>
+              <Select value={selectedDevice} onValueChange={setSelectedDevice}>
+                <SelectTrigger className="bg-card border-card-border">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {devices.map((device) => (
+                    <SelectItem key={device} value={device}>
+                      {device}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-muted-foreground">OS</label>
+              <Select value={selectedOS} onValueChange={setSelectedOS}>
+                <SelectTrigger className="bg-card border-card-border">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {osVersions.map((os) => (
+                    <SelectItem key={os} value={os}>
+                      {os}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <Button 
+            size="lg" 
+            className="w-full gradient-tech border-0 glow-primary text-lg font-semibold"
+            // onClick={() => console.log(`Launching ${selectedDevice} with ${selectedOS}`)}
+            onClick={handleLaunchDevice}
+            disabled={isLaunching}
+          >
+            {isLaunching ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Launching...
+              </>
+            ): (
+              "Launch Device"
+            )}
+          </Button>
+        </div>
+
+        <div className="pt-6 border-t border-card-border">
+          {deviceStatus && (
+            <div className="mb-4">
+              <p className="text-sm font-medium text-muted-foreground mb-2"> Device Status:</p>
+              <Badge variant={deviceStatus === "ready" ? "default" : "secondary"}>{deviceStatus}</Badge>
+            </div>
+          )}
+          {sessionId && uploadOptions.length > 0 && (
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground mb-2">Upload Options for {selectedDevice}:</p>
+                <div className="flex gap-2">
+                  {uploadOptions.map((option) => (
+                    <Badge key={option} variant="outline">{option}</Badge>
+                  ))}
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => {
+                  //Handle the file upload component
+                  toast.info("Build upload functionality will be available here");
+                }}
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                  Upload Build
+              </Button>
+            </div>
+          )}
+          <p className="text-sm text-muted-foreground">
+            From emulator to reality in one click. Bring every device to your desk.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default DeviceLauncher;

@@ -1,0 +1,93 @@
+<svg viewBox="0 0 980 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="appMirror logo - highlighted tile background">
+  <title>appMirror — Highlighted Tile Background</title>
+  <defs>
+    <!-- Brand gradients -->
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22D3EE"/>
+      <stop offset="1" stop-color="#A78BFA"/>
+    </linearGradient>
+    <linearGradient id="brandH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#22D3EE"/>
+      <stop offset="50%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+
+    <!-- Tile gradient highlight -->
+    <radialGradient id="tileHighlight" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#0B1220" stop-opacity="1"/>
+    </radialGradient>
+
+    <!-- Panel glass -->
+    <linearGradient id="glassLeft" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="rgba(167,139,250,0.65)"/>
+      <stop offset="1" stop-color="rgba(167,139,250,0.35)"/>
+    </linearGradient>
+    <linearGradient id="glassRight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="rgba(34,211,238,0.9)"/>
+      <stop offset="1" stop-color="rgba(34,211,238,0.6)"/>
+    </linearGradient>
+
+    <!-- Shimmer -->
+    <linearGradient id="sweep" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="240" y2="0">
+      <stop offset="0" stop-color="rgba(255,255,255,0)"/>
+      <stop offset="0.5" stop-color="rgba(255,255,255,0.3)"/>
+      <stop offset="1" stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+
+    <!-- Glow for spark -->
+    <filter id="sparkGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <!-- Shadow/glow -->
+    <filter id="depth" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="6" stdDeviation="12" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+    <filter id="tileGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="18" result="g"/>
+      <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <!-- Mask for shimmer in right panel -->
+    <mask id="rightPanelMask">
+      <rect x="76" y="22" width="44" height="96" rx="10" fill="white"/>
+    </mask>
+  </defs>
+
+  <!-- === Icon === -->
+  <g transform="translate(80,60)" filter="url(#depth)">
+    <!-- Highlighted tile -->
+    <rect x="0" y="0" width="140" height="140" rx="28"
+          fill="url(#tileHighlight)" filter="url(#tileGlow)"/>
+    <!-- Outer stroke -->
+    <rect x="2" y="2" width="136" height="136" rx="26"
+          fill="none" stroke="url(#brand)" stroke-width="4" opacity="0.9"/>
+
+    <!-- Panels -->
+    <rect x="20" y="22" width="44" height="96" rx="10" fill="url(#glassLeft)"/>
+    <rect x="76" y="22" width="44" height="96" rx="10" fill="url(#glassRight)"/>
+
+    <!-- Mirror seam -->
+    <rect x="70" y="18" width="2" height="104" fill="#FFF" opacity="0.35"/>
+
+    <!-- Enlarged Spark ✨ -->
+    <g transform="translate(112,24) scale(1.8)" opacity="0.9" filter="url(#sparkGlow)">
+      <path d="M0 -6 L1.8 -1.8 L6 0 L1.8 1.8 L0 6 L-1.8 1.8 L-6 0 L-1.8 -1.8 Z" fill="#FFF"/>
+    </g>
+
+    <!-- Shimmer inside right panel -->
+    <g mask="url(#rightPanelMask)">
+      <rect x="76" y="22" width="240" height="96" fill="url(#sweep)">
+        <animate attributeName="x" from="-200" to="76" dur="2.8s" repeatCount="indefinite"/>
+      </rect>
+    </g>
+  </g>
+
+  <!-- === Wordmark === -->
+  <g transform="translate(250,155)">
+    <text font-family="Poppins, Inter, Segoe UI, Arial, sans-serif"
+          font-size="104" font-weight="800" fill="url(#brandH)">appMirror</text>
+  </g>
+</svg>
